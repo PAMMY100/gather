@@ -19,7 +19,7 @@ const Navbar = () => {
         </Link>
       </div>
       {/* CENTER */}
-      <div className="hidden md:flex w-[50%]">
+      <div className="hidden md:flex w-[50%] text-sm items-center">
         <div className="flex gap-6 text-gray-600">
           <Link href="/" className="flex items-center gap-2">
             <Image
@@ -52,6 +52,14 @@ const Navbar = () => {
             <span>Stories</span>
           </Link>
         </div>
+        <div className="hidden xl:flex p-2 bg-slate-100 items-center rounded-xl">
+          <input
+            type="text"
+            placeholder="search..."
+            className="bg-transparent outline-none"
+          />
+          <Image src="/search.png" alt="search" width={14} height={14} />
+        </div>
       </div>
       {/* RIGHT */}
       <div className="w-[30%] flex items-center gap-4 xl:gap-8">
@@ -61,7 +69,7 @@ const Navbar = () => {
         <ClerkLoaded>
           <SignedIn>
             <div className="cursor-pointer">
-              <Image src="/people.png" alt="" width={20} height={20} />
+              <Image src="/people.png" alt="" width={24} height={24} />
             </div>
             <div className="cursor-pointer">
               <Image src="/messages.png" alt="" width={20} height={20} />
@@ -73,7 +81,7 @@ const Navbar = () => {
           </SignedIn>
           <SignedOut>
             <div className="flex items-center gap-2 text-sm">
-              <Image src="/login.png" alt="" width={20} height={20} />
+              <Image src="/login.svg" alt="" width={20} height={20} />
               <Link href="/sign-in">Login/Register</Link>
             </div>
           </SignedOut>
