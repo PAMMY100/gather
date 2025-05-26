@@ -75,7 +75,7 @@ const Post = () => {
               className="cursor-pointer"
             />
             <span className="text-gray-300">|</span>
-            <span className="text-gray-500">
+            <span className="text-gray-500 flex">
               123 <span className="hidden md:inline"> share</span>
             </span>
           </div>

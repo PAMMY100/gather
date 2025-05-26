@@ -42,7 +42,7 @@ const UserInfoCard = ({ userId }: { userId: string }) => {
         </div>
         <div className="flex items-center justify-between">
           <div className="flex gap-1 items-center">
-            <Image src="" alt="" width={16} height={16} />
+            <Image src="/link.png" alt="" width={16} height={16} />
             <Link href="" className="text-blue-500 font-medium">
               Sam.dev
             </Link>

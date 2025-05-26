@@ -1,6 +1,12 @@
+import prisma from "@/lib/client";
+import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 
-const AddPost = () => {
+const AddPost = async () => {
+  const { userId } = await auth();
+
+  console.log(userId);
+
   return (
     <div className="p-4 bg-white shadow-md rounded-lg flex gap-4 justify-between text-sm">
       {/* Avatar */}
@@ -14,9 +20,10 @@ const AddPost = () => {
       {/* Post */}
       <div className="flex-1">
         {/* Text Input */}
-        <div className="flex gap-4">
+        <form action="" className="flex gap-4">
           <textarea
             placeholder="what's on your mind?"
+            name="desc"
             className="bg-slate-100 rounded-lg flex-1 p-2"
           />
           <Image
@@ -26,7 +33,8 @@ const AddPost = () => {
             height={20}
             className="w-5 h-5 cursor-pointer self-end"
           />
-        </div>
+          <button>Send</button>
+        </form>
         {/*Post Options */}
         <div className="flex items-center gap-4 mt-4 text-gray-400 flex-wrap">
           <div className="flex items-center gap-2 cursor-pointer">
