@@ -5,3 +5,5 @@ const config = {
     webhookSec: process.env.WEBHOOK_SECRET!,
   },
 };
+
+export default config;
