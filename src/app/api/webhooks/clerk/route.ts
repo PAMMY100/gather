@@ -22,6 +22,12 @@ export async function POST(req: Request) {
   }
 
   const payload = await req.json();
+  console.log("Webhook Payload:", JSON.stringify(payload, null, 2));
+
+  console.log("Payload ID:", payload?.data?.id);
+  console.log("Username:", payload?.data?.username);
+  console.log("Image URL:", payload?.data?.image_url);
+
   const body = JSON.stringify(payload);
 
   const wh = new Webhook(WEBHOOK_SECRET);
@@ -46,9 +52,9 @@ export async function POST(req: Request) {
     try {
       await prisma.user.create({
         data: {
-          id: payload.data.id,
-          username: payload.data.username,
-          avater: payload.data.image_url || "/noAvatar.png",
+          id: evt.data.id,
+          username: JSON.parse(body).data.username,
+          avater: JSON.parse(body).data.image_url || "/noAvatar.png",
           cover: "/noCover.png",
         },
       });
@@ -64,8 +70,8 @@ export async function POST(req: Request) {
       await prisma.user.update({
         where: { id: payload.data.id },
         data: {
-          username: payload.data.username,
-          avater: payload.data.image_url || "/noAvatar.png",
+          username: JSON.parse(body).data.username,
+          avater: JSON.parse(body).data.image_url || "/noAvatar.png",
         },
       });
       return new Response("User updated successfully!", { status: 200 });
