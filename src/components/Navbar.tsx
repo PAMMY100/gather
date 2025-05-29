@@ -19,7 +19,7 @@ const Navbar = () => {
         </Link>
       </div>
       {/* CENTER */}
-      <div className="hidden md:flex w-[50%] text-sm items-center">
+      <div className="hidden md:flex justify-between w-[50%] text-lg items-center">
         <div className="flex gap-6 text-gray-600">
           <Link href="/" className="flex items-center gap-2">
             <Image

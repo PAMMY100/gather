@@ -24,10 +24,6 @@ export async function POST(req: Request) {
   const payload = await req.json();
   console.log("Webhook Payload:", JSON.stringify(payload, null, 2));
 
-  console.log("Payload ID:", payload?.data?.id);
-  console.log("Username:", payload?.data?.username);
-  console.log("Image URL:", payload?.data?.image_url);
-
   const body = JSON.stringify(payload);
 
   const wh = new Webhook(WEBHOOK_SECRET);

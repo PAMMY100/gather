@@ -1,9 +1,56 @@
 import Feed from "@/components/Feed";
 import LeftMenu from "@/components/LeftMenu";
 import RightMenu from "@/components/RightMenu";
+import prisma from "@/lib/client";
+import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 
-const Page = () => {
+const Page = async ({ params }: {params: {username: string}}) => {
+
+ const { username } = await params;
+
+
+  if (!username) {
+    return <div className="text-center">Username is required</div>;
+  }
+
+  const user = await prisma.user.findFirst({
+    where: {
+      username,
+    },
+    include: {
+      posts: true,
+      _count: {
+        select: {
+          posts: true,
+          followers: true,
+          followings: true,
+        }
+      }
+    }
+  })
+
+  if (!user) return notFound()
+
+  const {userId: currentUserId} = await auth();
+
+  let isBlocked;
+
+  if (currentUserId) {
+    const res = await prisma.block.findFirst({
+      where: {
+        blockerId: user.id,
+        blockedId: currentUserId,
+      }
+    })
+    if (res) isBlocked = true;
+  } else {
+    isBlocked = false;
+  }
+
+  if (isBlocked) return notFound();
+
   return (
     <div className="flex gap-6 pt-6">
       <div className="hidden xl:block w-[20%]">
@@ -27,18 +74,18 @@ const Page = () => {
                 className="rounded-full h-32 w-32 absolute left-0 right-0 m-auto -bottom-16 ring-4 ring-white object-cover"
               />
             </div>
-            <h1 className="mt-20 mb-4 text-2xl font-medium">Elva Weaver</h1>
+            <h1 className="mt-20 mb-4 text-2xl font-medium">{(user.name && user.surname) ? user.name + " " + user.surname : user.name}</h1>
             <div className="flex items-center justify-center gap-12 mb-4">
               <div>
-                <span className="">142</span>
+                <span className="">{user._count.posts}</span>
                 <span className="text-sm">Posts</span>
               </div>
               <div>
-                <span className="">1.2K</span>
+                <span className="">{user._count.followers}</span>
                 <span className="text-sm">Followers</span>
               </div>
               <div>
-                <span className="">1.4K</span>
+                <span className="">{user._count.followings}</span>
                 <span className="text-sm">Following</span>
               </div>
             </div>
@@ -47,7 +94,7 @@ const Page = () => {
         </div>
       </div>
       <div className="hidden lg:block w-[30%]">
-        <RightMenu userId="text" />
+        <RightMenu user={user} />
       </div>
     </div>
   );
