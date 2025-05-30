@@ -1,6 +1,6 @@
-import Feed from "@/components/Feed";
-import LeftMenu from "@/components/LeftMenu";
-import RightMenu from "@/components/RightMenu";
+import Feeds from "@/components/feed/Feed";
+import LeftMenu from "@/components/leftMenu/LeftMenu";
+import RightMenu from "@/components/rightmenu/RightMenu";
 import prisma from "@/lib/client";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
@@ -90,7 +90,7 @@ const Page = async ({ params }: {params: {username: string}}) => {
               </div>
             </div>
           </div>
-          <Feed />
+          <Feeds />
         </div>
       </div>
       <div className="hidden lg:block w-[30%]">

@@ -1,7 +1,7 @@
 import AddPost from "@/components/AddPost";
-import Feed from "@/components/Feed";
-import LeftMenu from "@/components/LeftMenu";
-import RightMenu from "@/components/RightMenu";
+import Feeds from "@/components/feed/Feed";
+import LeftMenu from "@/components/leftMenu/LeftMenu";
+import RightMenu from "@/components/rightmenu/RightMenu";
 import Stories from "@/components/Stories";
 import React from "react";
 
@@ -15,7 +15,7 @@ const HomePage = () => {
         <div className="flex flex-col gap-6">
           <Stories />
           <AddPost />
-          <Feed />
+          <Feeds />
         </div>
       </div>
       <div className="hidden lg:block w-[30%]">

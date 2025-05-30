@@ -1,8 +1,12 @@
+import prisma from "@/lib/client";
+import { auth } from "@clerk/nextjs/server";
 import { User } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
+import UserInfoCardInteraction from "./UserInfoCardInteraction";
+import UpdateUser from "./UpdateUser";
 
-const UserInfoCard = ({ user }: { user: User }) => {
+const UserInfoCard = async ({ user }: { user: User }) => {
 
   const createdAtDate = new Date(user.createdAt)
 
@@ -12,14 +16,53 @@ const UserInfoCard = ({ user }: { user: User }) => {
     day: "numeric",
   });
 
+  let isUserBlocked = false;
+  let isFollowing = false;
+  let isFollowingSent = false;
+
+  const {userId: currentUserId} = await auth();
+
+  if (!currentUserId) {
+    throw new Error("User not authenticated");
+  }
+
+  if (currentUserId) {
+    const blockRes = await prisma.block.findFirst({
+      where: {
+        blockerId: currentUserId,
+        blockedId: user.id,
+      }
+    })
+    
+    blockRes ? (isUserBlocked = true) : (isUserBlocked = false);
+
+    const followRes = await prisma.follower.findFirst({
+      where: {
+        followerId: currentUserId,
+        followingId: user.id,
+      }
+    })
+    
+    followRes ? (isFollowing = true) : (isFollowing = false);
+
+    const followReqRes = await prisma.followRequest.findFirst({
+      where: {
+        senderId: currentUserId,
+        receiverId: user.id,
+      }
+    })
+    
+    followReqRes ? (isFollowingSent = true) : (isFollowingSent = false);
+  }
+  
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md text-sm flex flex-col gap-4">
       <div className="flex justify-between items-center font-medium">
         <span className="text-gray-500">User Information</span>
-        <Link href="/" className="text-blue-500 text-xl">
+        {currentUserId === user.id ? (<UpdateUser />) : (<Link href="/" className="text-blue-500 text-xl">
           see all
-        </Link>
+        </Link>)}
       </div>
       {/* Bottom */}
       <div className="flex flex-col gap-4 text-gray-500">
@@ -54,16 +97,18 @@ const UserInfoCard = ({ user }: { user: User }) => {
             </Link>
           </div>}
           <div className="flex gap-1 items-center">
-            <Image src="" alt="" width={16} height={16} />
+            <Image src="/events.png" alt="" width={16} height={16} />
             <span>Joined {formattedDate}</span>
           </div>
         </div>
-        <button className="bg-blue-500 text-white rounded-md p-2 text-sm">
-          Follow
-        </button>
-        <span className="text-red-400 seld-end text-xs cursor-pointer">
-          Block User
-        </span>
+        {currentUserId && currentUserId !== user.id && (
+          <UserInfoCardInteraction 
+            userId={user.id} 
+            isUserBlocked={isUserBlocked} 
+            isFollowing={isFollowing} 
+            isFollowingSent={isFollowingSent}
+            />
+        )}
       </div>
     </div>
   );
