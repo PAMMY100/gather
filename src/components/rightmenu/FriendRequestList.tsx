@@ -1,16 +1,46 @@
 'use client';
 
+import { acceptFollowRequest } from "@/lib/actions";
 import { FollowRequest, User } from "@prisma/client";
 import Image from "next/image";
+import { useOptimistic, useState } from "react";
 
 type RequestWithUser = FollowRequest & {
     sender: User
 }
 
 const FriendRequestList = ({requests}: {requests : RequestWithUser[]}) => {
+    const [requestState, setRequestState] = useState<RequestWithUser[]>(requests);
+
+    const [optimisticRequests, removeOptimisticRequest] = useOptimistic(
+        requestState, 
+        (state, value:number) => state.filter((req) => req.id  !== value)
+    );
+
+
+    const accept = async (requestId: number, userId: string) => {
+        removeOptimisticRequest(requestId);
+        try {
+            await acceptFollowRequest(userId);
+            setRequestState((prev) => prev.filter((req) => req.id !== requestId));
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const reject = async (requestId: number, userId: string) => {
+        removeOptimisticRequest(requestId);
+        try {
+            await acceptFollowRequest(userId);
+            setRequestState((prev) => prev.filter((req) => req.id !== requestId));
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
   return (
     <div>
-        {requests.map((request) => (
+        {optimisticRequests.map((request) => (
 
             <div className="flex items-center justify-between" key={request.id}>
                 <div className="flex items-center gap-4">
@@ -24,20 +54,30 @@ const FriendRequestList = ({requests}: {requests : RequestWithUser[]}) => {
                 <span className="semi-bold">{(request.sender.name && request.sender.surname) ? request.sender.name + " " + request.sender.surname : request.sender.username}</span>
                 </div>
                 <div className="flex gap-3 justify-end">
-                <Image
-                    src="/accept.png"
-                    alt=""
-                    width={20}
-                    height={20}
-                    className="cursor-pointer"
-                />
-                <Image
-                    src="/reject.png"
-                    alt=""
-                    width={20}
-                    height={20}
-                    className="cursor-pointer"
-                />
+                    <form action={() => accept(request.id, request.sender.id)}>
+                        <button>
+                        <Image
+                            src="/accept.png"
+                            alt=""
+                            width={20}
+                            height={20}
+                            className="cursor-pointer"
+                        />
+                        </button>
+                    </form> 
+                    
+                    <form action={() => reject(request.id, request.sender.id)}>
+                        <button>
+                            <Image
+                                src="/reject.png"
+                                alt=""
+                                width={20}
+                                height={20}
+                                onClick={() => reject(request.id, request.sender.id)}
+                                className="cursor-pointer"
+                            />
+                        </button>
+                    </form>
                 </div>
             </div>
         ))}
