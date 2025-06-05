@@ -2,6 +2,9 @@
 
 import { auth } from "@clerk/nextjs/server"
 import prisma from "./client";
+import { object, success } from "zod/v4";
+import { updateProfileSchema } from "./validation";
+import { revalidatePath } from "next/cache";
 
 export const switchFollow = async (userId: string) => {
     const {userId: currentUserId} = await auth();
@@ -148,4 +151,47 @@ export const rejectFollowRequest = async (userId: string) => {
         console.log(err);
         throw new Error("something went wrong");
     }
+}
+
+
+export const updateProfile = async (prevState: {success: boolean, error: boolean}, payload: {formData: FormData, cover: string}) => {
+
+    const {formData, cover} = payload;
+    const fields = Object.fromEntries(formData) ;
+
+    const filteredFields = Object.fromEntries(
+        Object.entries(fields).filter(([_, value]) => value !== "")
+    )
+
+    console.log(fields);
+
+    const validFields = updateProfileSchema.safeParse({cover, ...filteredFields});
+
+    if (!validFields.success) {
+        console.log(validFields.error.flatten().fieldErrors);
+        return {success: false, error: true};
+    }
+
+    const {userId: currentUserId} = await auth();
+
+    if (!currentUserId) {
+        return {success: false, error: true};
+    }
+
+    try {
+        await prisma.user.update({
+            where: {
+                id: currentUserId,
+            },
+            data: validFields.data
+        })
+        
+        revalidatePath("/profile/" + validFields.data.name);
+        return {success: true, error: false};
+
+    } catch (error) {
+        console.log(error)
+        return {success: false, error: true};
+    }
+
 }

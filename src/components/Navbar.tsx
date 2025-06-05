@@ -64,7 +64,7 @@ const Navbar = () => {
       {/* RIGHT */}
       <div className="w-[30%] flex items-center gap-4 xl:gap-8">
         <ClerkLoading>
-          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-500 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white" />
+          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-500 border-solid border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white" />
         </ClerkLoading>
         <ClerkLoaded>
           <SignedIn>

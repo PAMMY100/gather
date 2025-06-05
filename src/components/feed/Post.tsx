@@ -1,20 +1,23 @@
 import Image from "next/image";
 import Comments from "./Comments";
+import { Post, User } from "@prisma/client";
 
-const Post = () => {
+type PostType = Post & {user: User} & {likes: [{userId: string}] | null} & {_count: {comments: number}}
+
+const Posts = ({post}:{post: PostType}) => {
   return (
     <div className="flex flex-col gap-4">
       {/* User */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Image
-            src="https://images.pexels.com/photos/20460446/pexels-photo-20460446/free-photo-of-ladder-on-sea-shore.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
+            src={post.user.avater || "/noAvatar.png"}
             alt=""
             width={40}
             height={40}
             className="w-10 h-10 rounded-full"
           />
-          <span className="font-medium">Jack McBride</span>
+          <span className="font-medium">{(post.user.name && post.user.surname) ? post.user.name + " " + post.user.surname : post.user.username}</span>
         </div>
         <Image src="/more.png" alt="" width={16} height={40} />
       </div>
@@ -86,4 +89,4 @@ const Post = () => {
   );
 };
 
-export default Post;
+export default Posts;

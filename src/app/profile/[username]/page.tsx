@@ -90,7 +90,7 @@ const Page = async ({ params }: {params: {username: string}}) => {
               </div>
             </div>
           </div>
-          <Feeds />
+          <Feeds username={username}/>
         </div>
       </div>
       <div className="hidden lg:block w-[30%]">
