@@ -5,6 +5,7 @@ import prisma from "./client";
 import { object, success } from "zod/v4";
 import { updateProfileSchema } from "./validation";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 export const switchFollow = async (userId: string) => {
     const {userId: currentUserId} = await auth();
@@ -192,6 +193,99 @@ export const updateProfile = async (prevState: {success: boolean, error: boolean
     } catch (error) {
         console.log(error)
         return {success: false, error: true};
+    }
+
+}
+
+
+export const switchLike = async (postId: number) => {
+    const {userId: currentUserId} = await auth();
+    if (!currentUserId) {
+        throw new Error("User not authenticated");
+    }
+    try {
+        const exisitingLike = await prisma.like.findFirst({
+            where: {
+                userId: currentUserId,
+                postId: postId,
+            }
+        })
+
+        if(exisitingLike) {
+            await prisma.like.delete({
+                where: {id: exisitingLike.id}
+            })
+        } else {
+            await prisma.like.create({
+                data: {
+                    userId: currentUserId,
+                    postId: postId, 
+                }
+            })
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+export const addComment = async (postId: number, desc: string) => {
+    const {userId} = await auth();
+    if (!userId) {
+        throw new Error("User not authenticated");
+    }
+
+    try {
+
+      const createdComment = await prisma.comment.create({
+        data: {
+            postId,
+            userId,
+            desc
+        }, include: {
+            user: true
+        }
+    })
+
+    return createdComment
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const addPost = async (formData: FormData, img: string) => {
+    const {userId} = await auth();
+    if (!userId) {
+        throw new Error("User not authenticated");
+    }
+
+    const desc = formData.get("desc") as string;
+
+    const Desc = z.string().min(1).max(255)
+
+    const validDesc = Desc.safeParse(desc);
+
+    if( !validDesc.success) {
+        console.log(validDesc.error.flatten().fieldErrors);
+        throw new Error("Invalid description");
+    }
+
+
+    try {
+        await prisma.post.create({
+            data: {
+               userId,
+               desc: validDesc.data,
+               img
+            }
+        })
+
+        revalidatePath("/");
+
+    } catch (error) {
+        console.log(error);
+        throw new Error("Failed to add post");
     }
 
 }
