@@ -5,10 +5,17 @@ import prisma from "@/lib/client";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { type Metadata } from 'next'
 
-const Page = async ({ params }: {params: {username: string}}) => {
+type PageProps = {
+  params: {
+    username: string;
+  };
+};
 
- const { username } = await params;
+const Page = async ({ params }: PageProps) => {
+
+ const { username } =  params;
 
 
   if (!username) {
