@@ -34,7 +34,7 @@ const Ad = ({ size }: { size: "sm" | "md" | "lg" }) => {
           />
           <span className="text-blue-500 font-medium">BigChef Lounge</span>
         </div>
-        <p className={`size==='sm` ? "text-xs" : "text-sm"}>
+        <p className={size === 'sm' ? "text-xs" : "text-sm"}>
           {size === "sm"
             ? "lorem hbee guuj gsmm lolln amet conferment kill"
             : size === "md"
