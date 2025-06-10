@@ -68,6 +68,9 @@ const Feeds = async ({username}: {username?: string}) => {
           }
         }
       },
+      orderBy: {
+        createdAt: 'desc',
+      }
     })
   }
 

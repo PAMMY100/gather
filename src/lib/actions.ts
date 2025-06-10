@@ -289,3 +289,58 @@ export const addPost = async (formData: FormData, img: string) => {
     }
 
 }
+
+
+export const addStory = async (img: string) => {
+    const { userId } = await auth();
+
+    if (!userId) return null;
+
+    try {
+        const existingStory = await prisma.story.findFirst({
+            where: {
+                userId,
+            }
+        })
+        if (existingStory) {
+            await prisma.story.delete({
+                where: {
+                    id: existingStory.id
+                }
+            })
+        }
+        const story = await prisma.story.create({
+            data: {
+                userId,
+                img,
+                expiredAt: new Date(Date.now() + 24*60*60*1000)
+            },
+            include: {
+                user: true
+            }
+        })
+
+        return story;
+
+    } catch (error) {
+        console.log(error)
+        throw new Error("something went wrong!..")
+    }
+}
+
+
+export const deletePost = async (postId: number) => {
+    const {userId} = await auth();
+    if (!userId) return null;
+
+    try {
+        await prisma.post.delete({
+            where: {
+                id: postId,
+                userId,
+            }
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
