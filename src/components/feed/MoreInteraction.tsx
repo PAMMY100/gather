@@ -1,10 +1,13 @@
 'use client';
 
+import { deletePost } from "@/lib/actions";
 import Image from "next/image";
 import { useState } from "react";
 
 const MoreInteraction = ({postId}: {postId: number}) => {
     const [open, setOpen] = useState(false);
+
+    
 
   return (
     <div className="">
@@ -13,7 +16,7 @@ const MoreInteraction = ({postId}: {postId: number}) => {
             <div className="absolute top-4 right-0 bg-white p-4 w-32 rounded-lg flex flex-col gap-2 text-xs shadow-md">
                 <span className="cursor-pointer">View</span>
                 <span className="cursor-pointer">Re-post</span>
-                <form action={}>
+                <form action={async () => { await deletePost(postId); }}>
                     <button className="text-red-500">Delete</button>
                 </form>
             </div>
