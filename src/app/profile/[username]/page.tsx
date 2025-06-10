@@ -1,5 +1,5 @@
 // src/app/profile/[username]/page.tsx
-import type { JSX } from 'react';
+import type { Metadata } from "next";
 import Feeds from "@/components/feed/Feed";
 import LeftMenu from "@/components/leftMenu/LeftMenu";
 import RightMenu from "@/components/rightmenu/RightMenu";
@@ -8,18 +8,34 @@ import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-type PageProps = {
-  params: {
-    username: string;
+// This function provides SEO metadata based on the username
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}): Promise<Metadata> {
+  const { username } = await params; // Resolve the promise
+
+  const user = await prisma.user.findFirst({
+    where: {
+      username,
+    },
+  });
+
+  if (!user) return {};
+
+  return {
+    title: `${user.name ?? user.username}'s Profile | Gather`,
+    description: `Explore ${user.name ?? user.username}'s profile and posts on Gather.`,
   };
-};
+}
 
-export default async function Page({ params }: PageProps): Promise<JSX.Element | null> {
-  const { username } = params;
-
-  if (!username) {
-    return <div className="text-center">Username is required</div>;
-  }
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
+  const { username } = await params; // Resolve the promise
 
   const user = await prisma.user.findFirst({
     where: {
@@ -32,26 +48,23 @@ export default async function Page({ params }: PageProps): Promise<JSX.Element |
           posts: true,
           followers: true,
           followings: true,
-        }
-      }
-    }
+        },
+      },
+    },
   });
 
   if (!user) return notFound();
 
   const { userId: currentUserId } = await auth();
 
-  let isBlocked = false;
-
-  if (currentUserId) {
-    const res = await prisma.block.findFirst({
-      where: {
-        blockerId: user.id,
-        blockedId: currentUserId,
-      }
-    });
-    if (res) isBlocked = true;
-  }
+  const isBlocked = currentUserId
+    ? !!(await prisma.block.findFirst({
+        where: {
+          blockerId: user.id,
+          blockedId: currentUserId,
+        },
+      }))
+    : false;
 
   if (isBlocked) return notFound();
 
