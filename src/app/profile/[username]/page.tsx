@@ -1,3 +1,5 @@
+// src/app/profile/[username]/page.tsx
+import type { JSX } from 'react';
 import Feeds from "@/components/feed/Feed";
 import LeftMenu from "@/components/leftMenu/LeftMenu";
 import RightMenu from "@/components/rightmenu/RightMenu";
@@ -5,7 +7,6 @@ import prisma from "@/lib/client";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { type Metadata } from 'next'
 
 type PageProps = {
   params: {
@@ -13,10 +14,8 @@ type PageProps = {
   };
 };
 
-const Page = async ({ params }: PageProps) => {
-
- const { username } =  params;
-
+export default async function Page({ params }: PageProps): Promise<JSX.Element | null> {
+  const { username } = params;
 
   if (!username) {
     return <div className="text-center">Username is required</div>;
@@ -36,13 +35,13 @@ const Page = async ({ params }: PageProps) => {
         }
       }
     }
-  })
+  });
 
-  if (!user) return notFound()
+  if (!user) return notFound();
 
-  const {userId: currentUserId} = await auth();
+  const { userId: currentUserId } = await auth();
 
-  let isBlocked;
+  let isBlocked = false;
 
   if (currentUserId) {
     const res = await prisma.block.findFirst({
@@ -50,10 +49,8 @@ const Page = async ({ params }: PageProps) => {
         blockerId: user.id,
         blockedId: currentUserId,
       }
-    })
+    });
     if (res) isBlocked = true;
-  } else {
-    isBlocked = false;
   }
 
   if (isBlocked) return notFound();
@@ -81,23 +78,27 @@ const Page = async ({ params }: PageProps) => {
                 className="rounded-full h-32 w-32 absolute left-0 right-0 m-auto -bottom-16 ring-4 ring-white object-cover"
               />
             </div>
-            <h1 className="mt-20 mb-4 text-2xl font-medium">{(user.name && user.surname) ? user.name + " " + user.surname : user.name}</h1>
+            <h1 className="mt-20 mb-4 text-2xl font-medium">
+              {(user.name && user.surname)
+                ? `${user.name} ${user.surname}`
+                : user.name}
+            </h1>
             <div className="flex items-center justify-center gap-12 mb-4">
               <div>
-                <span className="">{user._count.posts}</span>
+                <span>{user._count.posts}</span>
                 <span className="text-sm">Posts</span>
               </div>
               <div>
-                <span className="">{user._count.followers}</span>
+                <span>{user._count.followers}</span>
                 <span className="text-sm">Followers</span>
               </div>
               <div>
-                <span className="">{user._count.followings}</span>
+                <span>{user._count.followings}</span>
                 <span className="text-sm">Following</span>
               </div>
             </div>
           </div>
-          <Feeds username={username}/>
+          <Feeds username={username} />
         </div>
       </div>
       <div className="hidden lg:block w-[30%]">
@@ -105,6 +106,4 @@ const Page = async ({ params }: PageProps) => {
       </div>
     </div>
   );
-};
-
-export default Page;
+}

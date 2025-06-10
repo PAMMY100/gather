@@ -7,7 +7,7 @@ import { switchLike } from "@/lib/actions"
 
 const PostInteraction = ({postId, likes, commentNumber}: {postId: number, likes: string[], commentNumber: number}) => {
   
-    const {isLoaded, userId} = useAuth()
+    const {userId} = useAuth()
 
     const [likeState, setIsLikeState] = useState({
         likesCount: likes.length,

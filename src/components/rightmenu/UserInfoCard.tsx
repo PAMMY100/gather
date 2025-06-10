@@ -34,7 +34,7 @@ const UserInfoCard = async ({ user }: { user: User }) => {
       }
     })
     
-    blockRes ? (isUserBlocked = true) : (isUserBlocked = false);
+    isUserBlocked = !!blockRes;
 
     const followRes = await prisma.follower.findFirst({
       where: {
@@ -43,7 +43,7 @@ const UserInfoCard = async ({ user }: { user: User }) => {
       }
     })
     
-    followRes ? (isFollowing = true) : (isFollowing = false);
+    isFollowing = !!followRes;
 
     const followReqRes = await prisma.followRequest.findFirst({
       where: {
@@ -52,7 +52,7 @@ const UserInfoCard = async ({ user }: { user: User }) => {
       }
     })
     
-    followReqRes ? (isFollowingSent = true) : (isFollowingSent = false);
+    isFollowingSent = !!followReqRes;
   }
   
 

@@ -6,9 +6,16 @@ import Image from "next/image";
 import { useActionState, useState } from "react";
 import UpdateButton from "./UpdateButton";
 
+type CloudinaryResult = {
+  secure_url: string;
+  public_id: string;
+  format?: string;
+  [key: string]: any;
+};
+
 const UpdateUser = ({user}: {user: User}) => {
     const [open, setOpen] = useState(false);
-    const [cover, setCover] = useState<any>()
+    const [cover, setCover] = useState<CloudinaryResult | null>(null)
 
     const handleClose = () => {
         setOpen(false);
@@ -25,7 +32,14 @@ const UpdateUser = ({user}: {user: User}) => {
                 <h1 className="">Update Profile</h1>
                 <div className="mt-4 text-lg text-gray-500">Use the Navbar profile to change the avater or username</div>
                 
-                <CldUploadWidget uploadPreset="gather" onSuccess={(result) => setCover(result.info)}>
+                <CldUploadWidget
+                    uploadPreset="gather"
+                    onSuccess={(result) => {
+                        if (result && typeof result.info === "object" && result.info !== null && "secure_url" in result.info) {
+                            setCover(result.info as CloudinaryResult);
+                        }
+                    }}
+                >
                         {({ open }) => {
                             return (
                             <div className="flex flex-col gap-4 my-4" onClick={() => open()}>

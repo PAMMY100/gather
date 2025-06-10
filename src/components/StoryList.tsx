@@ -9,17 +9,22 @@ import { useOptimistic, useState } from "react"
 
 type StoryWithUser = Story & {user: User}
 
+type CloudinaryImage = {
+  public_id: string;
+  secure_url: string;
+};
+
 const StoryList = ({stories, userId}: {stories: StoryWithUser[], userId: string}) => {
     const {user} = useUser()
     const [storyList, setStoryList] = useState(stories)
-    const [img, setImg] = useState<any>()
+    const [img, setImg] = useState<CloudinaryImage | null>(null)
 
     const [optimisticStory, addOptimisticStory] = useOptimistic(storyList, (state, value: StoryWithUser) => {
         return [value, ...state]
     })
 
     const add = async () => {
-        if (!img.secure_url) return;
+        if (!img?.secure_url) return;
         
         addOptimisticStory({
             id: Math.random(),
@@ -57,7 +62,9 @@ const StoryList = ({stories, userId}: {stories: StoryWithUser[], userId: string}
   return (
     <>
         <CldUploadWidget uploadPreset="gather" onSuccess={(result, {widget}) =>{ 
-              setImg(result.info);
+              if (result.info && typeof result.info === "object" && "secure_url" in result.info && "public_id" in result.info) {
+                setImg(result.info as CloudinaryImage);
+              }
               widget.close();
               }}>
                         {({ open }) => {

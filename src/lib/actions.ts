@@ -2,7 +2,6 @@
 
 import { auth } from "@clerk/nextjs/server"
 import prisma from "./client";
-import { object, success } from "zod/v4";
 import { updateProfileSchema } from "./validation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -161,7 +160,7 @@ export const updateProfile = async (prevState: {success: boolean, error: boolean
     const fields = Object.fromEntries(formData) ;
 
     const filteredFields = Object.fromEntries(
-        Object.entries(fields).filter(([_, value]) => value !== "")
+        Object.entries(fields).filter(([, value]) => value !== "")
     )
 
     console.log(fields);
@@ -321,6 +320,7 @@ export const addStory = async (img: string) => {
         })
 
         return story;
+        revalidatePath('/')
 
     } catch (error) {
         console.log(error)

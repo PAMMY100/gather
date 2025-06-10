@@ -6,10 +6,15 @@ import { useState } from "react";
 import AddPostButton from "./AddPostButton";
 import { addPost } from "@/lib/actions";
 
+type CloudinaryImage = {
+  public_id: string;
+  secure_url: string;
+};
+
 const AddPost =  () => {
   const {isLoaded, user} = useUser()
   const [desc, setDesc] = useState("");
-  const [img, setImg] = useState<any>()
+  const [img, setImg] = useState<CloudinaryImage | null>(null)
 
   if (!isLoaded) {
     return <div className="text-center">Loading...</div>;
@@ -50,7 +55,12 @@ const AddPost =  () => {
         {/*Post Options */}
         <div className="flex items-center gap-4 mt-4 text-gray-400 flex-wrap">
             <CldUploadWidget uploadPreset="gather" onSuccess={(result, {widget}) =>{ 
-              setImg(result.info);
+              if (result.info && typeof result.info === "object" && "public_id" in result.info && "secure_url" in result.info) {
+                setImg({
+                  public_id: (result.info as any).public_id,
+                  secure_url: (result.info as any).secure_url,
+                });
+              }
               widget.close();
               }}>
                         {({ open }) => {

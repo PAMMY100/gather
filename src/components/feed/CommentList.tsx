@@ -5,7 +5,6 @@ import { useUser } from "@clerk/nextjs"
 import { Comment, User } from "@prisma/client"
 import Image from "next/image"
 import { useOptimistic, useState } from "react"
-import { date } from "zod/v4"
 
 type CommentType = Comment & { user: User }
 

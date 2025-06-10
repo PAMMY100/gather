@@ -1,12 +1,21 @@
 import { auth } from "@clerk/nextjs/server";
 import Posts from "./Post";
 import prisma from "@/lib/client";
+import { Post, User } from "@prisma/client";
+
+type PostWithExtras = Post & {
+  user: User;
+  likes: { userId: string }[];
+  _count: {
+    comments: number;
+  };
+};
 
 const Feeds = async ({username}: {username?: string}) => {
 
   const {userId} = await auth();
 
-  let posts: any[] = [];
+  let posts: PostWithExtras[] = [];
 
   if (username) {
     posts = await prisma.post.findMany({
