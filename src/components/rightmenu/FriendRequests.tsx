@@ -4,7 +4,6 @@ import Link from "next/link";
 import FriendRequestList from "./FriendRequestList";
 
 const FriendRequests = async () => {
-
   const { userId } = await auth();
 
   if (!userId) return null;
@@ -15,10 +14,17 @@ const FriendRequests = async () => {
     },
     include: {
       sender: true,
-    }
-  })
+    },
+  });
 
   if (requests.length === 0) return null;
+
+  // Filter out requests with null sender
+  const validRequests = requests.filter(
+    (req): req is typeof req & { sender: NonNullable<typeof req.sender> } => req.sender !== null
+  );
+
+  if (validRequests.length === 0) return null;
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md text-sm flex flex-col gap-4">
@@ -28,7 +34,7 @@ const FriendRequests = async () => {
           see all
         </Link>
       </div>
-      <FriendRequestList requests={requests} />
+      <FriendRequestList requests={validRequests} />
     </div>
   );
 };
